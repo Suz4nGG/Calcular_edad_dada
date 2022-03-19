@@ -3,5 +3,3 @@ Hacer un programa que recibe la fecha de nacimiento de una persona en 3 entradas
 
 - Valida entrada
 - Maneja adecuadamente excepciones
-
-* Sube tu código a esta actividad
