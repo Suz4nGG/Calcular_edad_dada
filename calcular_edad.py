@@ -7,6 +7,13 @@
 from calendar import isleap
 import argparse
 import datetime
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S',
+                    level=logging.INFO,
+                    filename='app.log',
+                    filemode='a')
 
 
 def __process_input__numeric__(value: int):
@@ -19,6 +26,7 @@ def __process_input__numeric__(value: int):
     if value.isnumeric():
         return int(value)
     else:
+        logging.error(f'Fallo al convertir {value} a int')
         return None
 
 
@@ -45,6 +53,7 @@ def __process_month_string__(value: str):
             if value == month:
                 return int(months[month])
     else:
+        # logging.error(f'El dato {value} no es una cadena valida')
         return None
 
 
@@ -55,7 +64,8 @@ def __validate_inputs__(dia: int, mes: str, anio: int):
     try:
         return {"dia": int(dia), "mes": int(mes), "anio": int(anio)}
     except:
-        print('El o los argumentos son invalidos')
+        logging.exception('Argumentos invalidos', stack_info=True)
+        return None
 
 
 def __current_date__():
@@ -87,15 +97,14 @@ def __validate_data__(data):
     bisiesto = isleap(anio)
     if (bisiesto):
         if (validar_mes_28) and (dia > 0 and dia <= 29) and (validar_anio):
-            print('Bisiesto', anio)
+            print('¡Año Bisiesto!')
             return {"dia": dia, "mes": mes, "anio": anio}
         elif (validar_meses_31) and (dia > 0 and dia <= 31) and (validar_anio):
             return {"dia": dia, "mes": mes, "anio": anio}
         elif (validar_meses_30) and ((dia > 0 and dia <= 30)) and (validar_anio):
             return {"dia": dia, "mes": mes, "anio": anio}
         else:
-            print('Verifica los datos ingresados')
-            print(f'Día: {dia} - Mes: {mes}° - Año: {anio}')
+            logging.error(f'Verifica tus datos: día:{dia}/mes:{mes}/año:{anio}')
             exit(1)
     else:
         if (validar_mes_28) and (dia > 0 and dia <= 28) and (validar_anio):
@@ -105,8 +114,7 @@ def __validate_data__(data):
         elif (validar_meses_30) and ((dia > 0 and dia <= 30)) and (validar_anio):
             return {"dia": dia, "mes": mes, "anio": anio}
         else:
-            print('Verifica los datos ingresados')
-            print(f'Día: {dia} - Mes: {mes} ° - Año: {anio}')
+            logging.error(f'Verifica tus datos: día:{dia}/mes:{mes}/año:{anio}')
             exit(1)
 
 
@@ -117,12 +125,14 @@ def __leap_years_(anio, anio_actual):
             count_anios += 1
     return count_anios
 
+
 def calculate_age(data_validate):
     dia, mes, anio = data_validate['dia'], data_validate['mes'], data_validate['anio']
-    dia_actual, mes_actual, anio_actual = int(__current_date__().strftime("%d")), int(__current_date__().strftime("%m")), int(__current_date__().strftime("%Y"))
+    dia_actual, mes_actual, anio_actual = int(__current_date__().strftime("%d")), int(
+        __current_date__().strftime("%m")), int(__current_date__().strftime("%Y"))
     # * Día actual
     if isleap(anio) and dia == 29 and mes == 2:
-        print('Tu edad actual es:', __leap_years_(anio, anio_actual), 'años')
+        print('Tu edad actual es:', __leap_years_(anio, anio_actual), 'años, por ser año bisiesto')
     if mes == mes_actual and dia == dia_actual:
         print('Tu edad actual es: ', anio_actual - anio, 'años')
         exit(0)
